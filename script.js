@@ -1,3 +1,5 @@
+// import './styles.css';
+
 const gameContainer = document.getElementById('game');
 
 const COLORS = [
@@ -42,12 +44,15 @@ let shuffledColors = shuffle(COLORS);
 // it creates a new div and gives it a class with the value of the color
 // it also adds an event listener for a click for each card
 function createDivsForColors(colorArray) {
-	for (let color of colorArray) {
+	for (let index = 0; index < COLORS.length; index++) {
 		// create a new div
 		const newDiv = document.createElement('div');
 
 		// give it a class attribute for the value we are looping over
-		newDiv.classList.add(color);
+		newDiv.classList.add('card');
+		// newDiv.style.backgroundColor = color;
+		newDiv.setAttribute('data-xyz', COLORS[index]);
+		newDiv.setAttribute('data-index', index);
 
 		// call a function handleCardClick when a div is clicked on
 		newDiv.addEventListener('click', handleCardClick);
@@ -57,17 +62,58 @@ function createDivsForColors(colorArray) {
 	}
 }
 
+let lastCardClicked = null;
+let isFirstClick = true;
+let score = 0;
+
 // TODO: Implement this function!
 function handleCardClick(event) {
 	// you can use event.target to see which element was clicked
-	console.log('you just clicked', event.target);
-}
-function makeCardColor(colorArray) {
-	for (let color of colorArray) {
-		function setColor(evt) {
-			const getDiv = document.getElementById('game');
-			getDiv.addEventListener('click', (evt.target.style.backgroundColor = COLORS[color]));
+
+	let currentCard = event.target;
+	const currentColor = currentCard.getAttribute('data-xyz');
+	currentCard.style.backgroundColor = currentColor;
+
+	let prevColor;
+
+	if (lastCardClicked) {
+		prevColor = lastCardClicked.getAttribute('data-xyz');
+	}
+	if (
+		lastCardClicked &&
+		currentColor === prevColor &&
+		currentCard.getAttribute('data-index') !== lastCardClicked.getAttribute('data-index')
+	) {
+		console.log('MATCH FOUND!');
+		lastCardClicked = null;
+	} else {
+		// INCR SCORE
+		if (!isFirstClick) {
+			(function(prev, cur) {
+				setTimeout(() => {
+					prev.style.backgroundColor = '';
+					cur.style.backgroundColor = '';
+				}, 1000);
+			})(lastCardClicked, currentCard);
 		}
+	}
+	lastCardClicked = event.target;
+	console.log('you just clicked', lastCardClicked);
+	isFirstClick = !isFirstClick;
+}
+
+// This is what I am trying to figure out. It should loop thru the array like
+// the function above, then execute the inner function setColor
+// which (in theory) should set the background color every time through the loop.
+// I'm not sure why, but it is not executing the way it should and I can't
+// seem to figure out what is going wrong
+
+function makeCardColor(colorArray) {
+	function setColor(evt) {
+		const getDiv = document.getElementById('game');
+		getDiv.addEventListener('click', (evt.target.style.backgroundColor = COLORS[color]));
+	}
+	for (let color of colorArray) {
 		return setColor();
 	}
 }
