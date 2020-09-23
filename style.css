@@ -1,27 +1,34 @@
+* {
+	font-family: 'Oxygen', sans-serif;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
 #game div {
-	border: 1px solid black;
+	border: 3px solid black;
 	width: 15%;
 	height: 200px;
 	margin: 10px;
 	display: inline-block;
+	background-color: black;
 }
 
-/* .purple {
-	background-color: purple;
+body {
+	height: 100vh;
+	background-color: #99968c;
 }
 
-.green {
-	background-color: green;
+h1 {
+	color: #4480aa;
+	text-align: center;
+	font-family: 'Oxygen', sans-serif;
 }
 
-.blue {
-	background-color: blue;
+#restart {
+	text-align: right;
 }
 
-.red {
-	background-color: red;
-}
-
-.orange {
+button {
 	background-color: orange;
-} */
+	border-radius: 12%;
+}

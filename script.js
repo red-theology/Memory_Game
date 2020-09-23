@@ -1,5 +1,3 @@
-// import './styles.css';
-
 const gameContainer = document.getElementById('game');
 
 const COLORS = [
@@ -62,66 +60,84 @@ function createDivsForColors(colorArray) {
 	}
 }
 
+// state variables
+let prevColor = null;
 let lastCardClicked = null;
 let isFirstClick = true;
+let revealedCards = 0;
 let score = 0;
 
-// TODO: Implement this function!
 function handleCardClick(event) {
-	// you can use event.target to see which element was clicked
-
 	let currentCard = event.target;
 	const currentColor = currentCard.getAttribute('data-xyz');
-	currentCard.style.backgroundColor = currentColor;
-
-	let prevColor;
 
 	if (lastCardClicked) {
 		prevColor = lastCardClicked.getAttribute('data-xyz');
-	}
-	if (
-		lastCardClicked &&
-		currentColor === prevColor &&
-		currentCard.getAttribute('data-index') !== lastCardClicked.getAttribute('data-index')
-	) {
-		console.log('MATCH FOUND!');
-		lastCardClicked = null;
-	} else {
-		// INCR SCORE
-		if (!isFirstClick) {
-			(function(prev, cur) {
-				setTimeout(() => {
-					prev.style.backgroundColor = '';
-					cur.style.backgroundColor = '';
-				}, 1000);
-			})(lastCardClicked, currentCard);
+		if (currentCard.getAttribute('data-index') === lastCardClicked.getAttribute('data-index')) {
+			console.log('same card clicked');
+			return;
 		}
 	}
-	lastCardClicked = event.target;
-	console.log('you just clicked', lastCardClicked);
+	if (revealedCards < 2) {
+		currentCard.style.backgroundColor = currentColor;
+		revealedCards++;
+	} else {
+		return; // ABORT!
+	}
+	// This is where we find a match
+	if (!isFirstClick && lastCardClicked && currentColor === prevColor) {
+		console.log('MATCH FOUND!');
+		score += 1;
+
+		lastCardClicked.removeEventListener('click', handleCardClick);
+		currentCard.removeEventListener('click', handleCardClick);
+
+		if (score === COLORS.length / 2) {
+			setTimeout(() => {
+				alert(`You have matched all the cards! Your final score: ${score}`);
+				window.location.reload();
+			}, 200);
+		}
+
+		console.log('The score is now: ', score);
+		lastCardClicked = null;
+		revealedCards = 0;
+		isFirstClick = true;
+		prevColor = null;
+		return;
+	}
+	// if (currentCard.getAttribute('data-index') === lastCardClicked.getAttribute('data-index')) {
+	// 	//
+	// }
+
+	// This function should check to see if the revealed cards match and if they do not, it should flip them back over.
+	if (!isFirstClick) {
+		(function(prev, cur) {
+			// during this timeout function, the rest of the code will execute and then will reset to blank
+			setTimeout(() => {
+				prev.style.backgroundColor = '';
+				cur.style.backgroundColor = '';
+				// allowClick = true;
+				console.log('about to reset revealedCards: ', revealedCards);
+				revealedCards = 0;
+			}, 1000);
+		})(lastCardClicked, currentCard);
+		// allowClick = false;
+
+		console.log(isFirstClick, 'is first click');
+		console.log(lastCardClicked, 'is the last card clicked');
+		console.log(currentCard, 'is the current card clicked');
+	}
+	lastCardClicked = currentCard;
+	console.log('you just clicked', revealedCards, 'cards');
 	isFirstClick = !isFirstClick;
 }
 
-// This is what I am trying to figure out. It should loop thru the array like
-// the function above, then execute the inner function setColor
-// which (in theory) should set the background color every time through the loop.
-// I'm not sure why, but it is not executing the way it should and I can't
-// seem to figure out what is going wrong
-
-function makeCardColor(colorArray) {
-	function setColor(evt) {
-		const getDiv = document.getElementById('game');
-		getDiv.addEventListener('click', (evt.target.style.backgroundColor = COLORS[color]));
-	}
-	for (let color of colorArray) {
-		return setColor();
-	}
-}
-// function red(evt) {
-// 	evt.target.style.backgroundColor = 'red';
-// }
-
-// redClick[0].addEventListener('click', red);
+const restart = document.querySelector('#restart');
+restart.addEventListener('click', function() {
+	alert('You have restarted the game');
+	window.location.reload();
+});
 
 // when the DOM loads
 createDivsForColors(shuffledColors);
